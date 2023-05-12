@@ -16,7 +16,7 @@
 // limitations under the License.
 
 //! THIS FILE WAS AUTO-GENERATED USING THE SUBSTRATE BENCHMARK CLI VERSION 4.0.0-dev
-//! DATE: 2023-05-11 (Y/M/D)
+//! DATE: 2023-05-12 (Y/M/D)
 //! HOSTNAME: `runner-sgmchhtv-project-145-concurrent-0`, CPU: `Intel(R) Xeon(R) CPU @ 2.60GHz`
 //!
 //! SHORT-NAME: `extrinsic`, LONG-NAME: `ExtrinsicBase`, RUNTIME: `Development`
@@ -44,17 +44,17 @@ parameter_types! {
 	/// Calculated by multiplying the *Average* with `1.0` and adding `0`.
 	///
 	/// Stats nanoseconds:
-	///   Min, Max: 130_750, 131_964
-	///   Average:  131_178
-	///   Median:   131_083
-	///   Std-Dev:  282.63
+	///   Min, Max: 130_418, 132_850
+	///   Average:  130_951
+	///   Median:   130_945
+	///   Std-Dev:  281.68
 	///
 	/// Percentiles nanoseconds:
-	///   99th: 131_959
-	///   95th: 131_677
-	///   75th: 131_364
+	///   99th: 131_440
+	///   95th: 131_337
+	///   75th: 131_047
 	pub const ExtrinsicBaseWeight: Weight =
-		Weight::from_parts(WEIGHT_REF_TIME_PER_NANOS.saturating_mul(131_178), 0);
+		Weight::from_parts(WEIGHT_REF_TIME_PER_NANOS.saturating_mul(130_951), 0);
 }
 
 #[cfg(test)]

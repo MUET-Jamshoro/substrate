@@ -7545,6 +7545,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "partial_sort"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7924d1d0ad836f665c9065e26d016c673ece3993f30d340068b16f282afc1156"
+
+[[package]]
 name = "paste"
 version = "1.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9700,9 +9706,14 @@ dependencies = [
  "futures",
  "libp2p-identity",
  "log",
+ "mockall",
+ "parking_lot 0.12.1",
+ "partial_sort",
  "rand 0.8.5",
  "sc-utils",
  "serde_json",
+ "sp-arithmetic",
+ "sp-tracing",
  "wasm-timer",
 ]
 
@@ -12295,9 +12306,9 @@ dependencies = [
 
 [[package]]
 name = "tower-http"
-version = "0.3.5"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f873044bf02dd1e8239e9c1293ea39dad76dc594ec16185d0a1bf31d8dc8d858"
+checksum = "5d1d42a9b3f3ec46ba828e8d376aec14592ea199f70a06a548587ecd1c4ab658"
 dependencies = [
  "bitflags",
  "bytes",

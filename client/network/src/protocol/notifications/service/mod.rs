@@ -78,7 +78,7 @@ enum InnerNotificationEvent {
 		handshake: Vec<u8>,
 
 		/// Role of the peer.
-		role: ObservedRole,
+		role: ObservedRole, // TODO: get this from `PeerStore`
 
 		/// Negotiated fallback.
 		negotiated_fallback: Option<ProtocolName>,

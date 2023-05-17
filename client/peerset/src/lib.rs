@@ -32,7 +32,7 @@
 //! In addition, for each, set, the peerset also holds a list of reserved nodes towards which it
 //! will at all time try to maintain a connection with.
 
-mod peer_store;
+pub mod peer_store;
 mod protocol_controller;
 
 use peer_store::{PeerStore, PeerStoreHandle, PeerStoreProvider};
@@ -268,10 +268,7 @@ pub struct Peerset {
 
 impl Peerset {
 	/// Builds a new peerset from the given configuration.
-	pub fn from_config(config: PeersetConfig) -> (Peerset, PeersetHandle) {
-		let default_set_config = &config.sets[0];
-		let peer_store = PeerStore::new(default_set_config.bootnodes.clone());
-
+	pub fn from_config(config: PeersetConfig, peer_store: PeerStore) -> (Peerset, PeersetHandle) {
 		let (to_notifications, from_controllers) =
 			tracing_unbounded("mpsc_protocol_controllers_to_notifications", 10_000);
 

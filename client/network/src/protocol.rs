@@ -36,6 +36,7 @@ use libp2p::{
 use log::{debug, error, warn};
 
 use sc_network_common::role::Roles;
+use sc_peerset::peer_store::PeerStore;
 use sc_utils::mpsc::TracingUnboundedSender;
 use sp_runtime::traits::Block as BlockT;
 
@@ -101,6 +102,7 @@ impl<B: BlockT> Protocol<B> {
 	/// Create a new instance.
 	pub fn new(
 		roles: Roles,
+		peer_store: PeerStore,
 		network_config: &config::NetworkConfiguration,
 		notification_protocols: Vec<config::NonDefaultSetConfig>,
 		mut block_announces_protocol: config::NonDefaultSetConfig,
@@ -155,7 +157,7 @@ impl<B: BlockT> Protocol<B> {
 				});
 			}
 
-			sc_peerset::Peerset::from_config(sc_peerset::PeersetConfig { sets })
+			sc_peerset::Peerset::from_config(sc_peerset::PeersetConfig { sets }, peer_store)
 		};
 
 		let (behaviour, notification_protocols) = {

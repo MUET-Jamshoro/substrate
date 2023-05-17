@@ -23,7 +23,8 @@ use rand::{
 	seq::IteratorRandom,
 };
 use sc_peerset::{
-	DropReason, IncomingIndex, Message, Peerset, PeersetConfig, ReputationChange, SetConfig, SetId,
+	peer_store::PeerStore, DropReason, IncomingIndex, Message, Peerset, PeersetConfig,
+	ReputationChange, SetConfig, SetId,
 };
 use std::{
 	collections::{HashMap, HashSet},
@@ -128,31 +129,36 @@ fn test_once() {
 	let mut known_nodes = HashMap::<PeerId, State>::new();
 	// Nodes that we have reserved. Always a subset of `known_nodes`.
 	let mut reserved_nodes = HashSet::<PeerId>::new();
+	let bootnodes = (0..Uniform::new_inclusive(0, 4).sample(&mut rng))
+		.map(|_| {
+			let id = PeerId::random();
+			known_nodes.insert(id, State::Disconnected);
+			id
+		})
+		.collect::<Vec<_>>();
+	let peer_store = PeerStore::new(bootnodes.iter().map(|peer_id| *peer_id).collect());
 
-	let (mut peerset, peerset_handle) = Peerset::from_config(PeersetConfig {
-		sets: vec![SetConfig {
-			bootnodes: (0..Uniform::new_inclusive(0, 4).sample(&mut rng))
-				.map(|_| {
-					let id = PeerId::random();
-					known_nodes.insert(id, State::Disconnected);
-					id
-				})
-				.collect(),
-			reserved_nodes: {
-				(0..Uniform::new_inclusive(0, 2).sample(&mut rng))
-					.map(|_| {
-						let id = PeerId::random();
-						known_nodes.insert(id, State::Disconnected);
-						reserved_nodes.insert(id);
-						id
-					})
-					.collect()
-			},
-			in_peers: Uniform::new_inclusive(0, 25).sample(&mut rng),
-			out_peers: Uniform::new_inclusive(0, 25).sample(&mut rng),
-			reserved_only: Uniform::new_inclusive(0, 10).sample(&mut rng) == 0,
-		}],
-	});
+	let (mut peerset, peerset_handle) = Peerset::from_config(
+		PeersetConfig {
+			sets: vec![SetConfig {
+				bootnodes,
+				reserved_nodes: {
+					(0..Uniform::new_inclusive(0, 2).sample(&mut rng))
+						.map(|_| {
+							let id = PeerId::random();
+							known_nodes.insert(id, State::Disconnected);
+							reserved_nodes.insert(id);
+							id
+						})
+						.collect()
+				},
+				in_peers: Uniform::new_inclusive(0, 25).sample(&mut rng),
+				out_peers: Uniform::new_inclusive(0, 25).sample(&mut rng),
+				reserved_only: Uniform::new_inclusive(0, 10).sample(&mut rng) == 0,
+			}],
+		},
+		peer_store,
+	);
 
 	let new_id = PeerId::random();
 	known_nodes.insert(new_id, State::Disconnected);

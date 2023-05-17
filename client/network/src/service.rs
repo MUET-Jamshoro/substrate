@@ -145,6 +145,7 @@ where
 	/// `worker.service()`. The `NetworkService` can be shared through the codebase.
 	pub fn new(params: Params<B>) -> Result<Self, Error> {
 		let FullNetworkConfiguration {
+			peer_store,
 			notification_protocols,
 			request_response_protocols,
 			mut network_config,
@@ -264,6 +265,7 @@ where
 
 		let (protocol, peerset_handle, mut known_addresses) = Protocol::new(
 			From::from(&params.role),
+			peer_store,
 			&network_config,
 			notification_protocols,
 			params.block_announce_config,

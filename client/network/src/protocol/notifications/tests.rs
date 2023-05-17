@@ -64,20 +64,26 @@ fn build_nodes() -> (Swarm<CustomProtoWithAddr>, Swarm<CustomProtoWithAddr>) {
 			.multiplex(yamux::Config::default())
 			.timeout(Duration::from_secs(20))
 			.boxed();
+		let bootnodes = if index == 0 {
+			keypairs.iter().skip(1).map(|keypair| keypair.public().to_peer_id()).collect()
+		} else {
+			vec![]
+		};
+		let peer_store =
+			sc_peerset::peer_store::PeerStore::new(bootnodes.iter().cloned().collect());
 
-		let (peerset, _) = sc_peerset::Peerset::from_config(sc_peerset::PeersetConfig {
-			sets: vec![sc_peerset::SetConfig {
-				in_peers: 25,
-				out_peers: 25,
-				bootnodes: if index == 0 {
-					keypairs.iter().skip(1).map(|keypair| keypair.public().to_peer_id()).collect()
-				} else {
-					vec![]
-				},
-				reserved_nodes: Default::default(),
-				reserved_only: false,
-			}],
-		});
+		let (peerset, _) = sc_peerset::Peerset::from_config(
+			sc_peerset::PeersetConfig {
+				sets: vec![sc_peerset::SetConfig {
+					in_peers: 25,
+					out_peers: 25,
+					bootnodes,
+					reserved_nodes: Default::default(),
+					reserved_only: false,
+				}],
+			},
+			peer_store,
+		);
 		let (protocol_handle_pair, _notif_service) =
 			crate::protocol::notifications::service::notification_service("/foo".into());
 

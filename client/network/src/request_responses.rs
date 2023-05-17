@@ -1051,7 +1051,7 @@ mod tests {
 		swarm::{Executor, Swarm, SwarmBuilder, SwarmEvent},
 		Multiaddr,
 	};
-	use sc_peerset::{Peerset, PeersetConfig, SetConfig};
+	use sc_peerset::{peer_store::PeerStore, Peerset, PeersetConfig, SetConfig};
 	use std::{iter, time::Duration};
 
 	struct TokioExecutor(tokio::runtime::Runtime);
@@ -1081,8 +1081,8 @@ mod tests {
 				reserved_only: false,
 			}],
 		};
-
-		let (peerset, handle) = Peerset::from_config(config);
+		let peer_store = PeerStore::new(Vec::new());
+		let (peerset, handle) = Peerset::from_config(config, peer_store);
 
 		let behaviour = RequestResponsesBehaviour::new(list, handle).unwrap();
 

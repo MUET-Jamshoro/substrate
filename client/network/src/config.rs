@@ -30,17 +30,11 @@ pub use crate::{
 	types::ProtocolName,
 };
 
-pub use libp2p::{identity::Keypair, multiaddr, Multiaddr, PeerId};
-
 use codec::Encode;
 use prometheus_endpoint::Registry;
 use zeroize::Zeroize;
 
-pub use sc_network_common::{
-	role::{Role, Roles},
-	sync::warp::WarpSyncProvider,
-	ExHashT,
-};
+use sc_peerset::peer_store::PeerStore;
 use sc_utils::mpsc::TracingUnboundedSender;
 use sp_runtime::traits::Block as BlockT;
 
@@ -58,7 +52,13 @@ use std::{
 
 pub use libp2p::{
 	build_multiaddr,
-	identity::{self, ed25519},
+	identity::{self, ed25519, Keypair},
+	multiaddr, Multiaddr, PeerId,
+};
+pub use sc_network_common::{
+	role::{Role, Roles},
+	sync::warp::WarpSyncProvider,
+	ExHashT,
 };
 
 /// Protocol name prefix, transmitted on the wire for legacy protocol names.
@@ -783,6 +783,9 @@ pub struct FullNetworkConfiguration {
 	/// List of request-response protocols that the node supports.
 	pub(crate) request_response_protocols: Vec<RequestResponseConfig>,
 
+	/// Peer store.
+	pub(crate) peer_store: PeerStore,
+
 	/// Network configuration.
 	pub network_config: NetworkConfiguration,
 }
@@ -790,7 +793,12 @@ pub struct FullNetworkConfiguration {
 impl FullNetworkConfiguration {
 	/// Create new [`FullNetworkConfiguration`].
 	pub fn new(network_config: &NetworkConfiguration) -> Self {
+		let peer_store = PeerStore::new(
+			network_config.boot_nodes.iter().map(|address| address.peer_id).collect(),
+		);
+
 		Self {
+			peer_store,
 			notification_protocols: Vec::new(),
 			request_response_protocols: Vec::new(),
 			network_config: network_config.clone(),

@@ -329,7 +329,7 @@ pub trait LocalTransactionPool: Send + Sync {
 	/// `TransactionSource::Local`.
 	fn submit_local(
 		&self,
-		at: &BlockId<Self::Block>,
+		at: <Self::Block as BlockT>::Hash,
 		xt: LocalTransactionFor<Self>,
 	) -> Result<Self::Hash, Self::Error>;
 }
@@ -341,17 +341,17 @@ pub trait LocalTransactionPool: Send + Sync {
 /// but since the transaction pool access is a separate `ExternalitiesExtension` it can
 /// be also used in context of other offchain calls. For one may generate and submit
 /// a transaction for some misbehavior reports (say equivocation).
-pub trait OffchainSubmitTransaction<Block: BlockT>: Send + Sync {
+trait OffchainSubmitTransaction<Block: BlockT>: Send + Sync {
 	/// Submit transaction.
 	///
 	/// The transaction will end up in the pool and be propagated to others.
-	fn submit_at(&self, at: &BlockId<Block>, extrinsic: Block::Extrinsic) -> Result<(), ()>;
+	fn submit_at(&self, at: Block::Hash, extrinsic: Block::Extrinsic) -> Result<(), ()>;
 }
 
 impl<TPool: LocalTransactionPool> OffchainSubmitTransaction<TPool::Block> for TPool {
 	fn submit_at(
 		&self,
-		at: &BlockId<TPool::Block>,
+		at: <TPool::Block as BlockT>::Hash,
 		extrinsic: <TPool::Block as BlockT>::Extrinsic,
 	) -> Result<(), ()> {
 		log::debug!(
@@ -369,6 +369,23 @@ impl<TPool: LocalTransactionPool> OffchainSubmitTransaction<TPool::Block> for TP
 				e
 			)
 		})
+	}
+}
+
+#[derive(Clone)]
+pub struct OffchainTransactionPoolFactory<Block: BlockT> {
+	pool: Arc<dyn OffchainSubmitTransaction<Block>>,
+}
+
+impl<Block: BlockT> OffchainTransactionPoolFactory<Block> {
+	pub fn new<T: LocalTransactionPool<Block = Block> + 'static>(tx_pool: T) -> Self {
+		Self {
+			pool: Arc::new(tx_pool),
+		}
+	}
+
+	pub fn offchain_transaction_pool(&self, at: Block::Hash) {
+
 	}
 }
 
